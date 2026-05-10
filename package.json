@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "description": "JorghitoTech - Portafolio de Desarrollo de Software",
+  "keywords": ["portfolio", "desarrollo", "software", "django", "react"],
+  "author": "Jorge",
+  "license": "MIT"
+}
