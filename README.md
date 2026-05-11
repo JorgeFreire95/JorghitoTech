@@ -1,18 +1,16 @@
-# JorghitoTech - Portafolio de Desarrollo de Software
+# JorghitoTech - Soluciones Digitales de Vanguardia
 
-Plataforma full-stack para mostrar servicios de desarrollo de software (web, desktop y móvil), proyectos realizados y panel de administración para el desarrollador.
+Plataforma profesional diseñada para ofrecer soluciones integrales en desarrollo de software (Web, Desktop y Móvil). Con una identidad visual premium inspirada en el futurismo digital y una arquitectura robusta.
 
 ## 🚀 Características
 
-- ✅ Autenticación con JWT
-- ✅ Panel de control para gestionar proyectos y servicios
-- ✅ Portafolio de proyectos destacados
-- ✅ Listado de servicios ofrecidos
-- ✅ Sistema de comentarios en proyectos
-- ✅ Formulario de contacto
-- ✅ Perfil de usuario personalizable
-- ✅ Diseño responsivo con Tailwind CSS
-- ✅ API REST con Django
+- ✅ **Identidad Visual Premium**: Tema oscuro con acentos de Cian Neón y efectos de resplandor (Glow).
+- ✅ **Planes Detallados**: Secciones específicas para Landing Pages, E-commerce, Sistemas Administrativos y Apps Móviles.
+- ✅ **Panel de Control**: Gestión integral de proyectos y servicios desde un dashboard privado.
+- ✅ **Autenticación Segura**: Implementación de JWT para proteger el acceso administrativo.
+- ✅ **Portafolio Interactivo**: Galería de proyectos con filtrado y sistema de comentarios.
+- ✅ **Diseño Responsivo**: Optimizado para dispositivos móviles, tablets y escritorio con Tailwind CSS.
+- ✅ **API REST Robusta**: Motor backend potente desarrollado con Django.
 
 ## 📋 Requisitos Previos
 
@@ -126,13 +124,15 @@ JorghitoTech/
 ## 🛣️ Rutas Principales
 
 ### Frontend
-- `/` - Página de inicio
-- `/servicios` - Listado de servicios
+- `/` - Página de inicio (Hero Section con Branding)
+- `/servicios` - Catálogo general de servicios
+- `/servicios/web-planes` - Detalles de Landing Pages y E-commerce
+- `/servicios/desktop-planes` - Detalles de Sistemas POS, Restaurantes y Facturación
+- `/servicios/movil-planes` - Detalles de Apps Corporativas y Personales
 - `/proyectos` - Portafolio de proyectos
-- `/contacto` - Formulario de contacto
-- `/login` - Iniciar sesión
-- `/registro` - Registrarse
-- `/panel` - Panel de control (protegido)
+- `/contacto` - Formulario de solicitud de cotización
+- `/login` - Acceso administrativo
+- `/panel` - Dashboard de gestión (Ruta Protegida)
 
 ### Backend API
 - `GET /api/services/` - Obtener servicios
@@ -163,18 +163,18 @@ VITE_API_URL=http://localhost:8000/api
 ## 📚 Tecnologías Utilizadas
 
 ### Backend
-- Django 4.2
+- Django 6.0 / 4.2+
 - Django REST Framework
-- PostgreSQL
-- JWT Authentication
+- SQLite (Desarrollo) / PostgreSQL (Producción)
+- JWT Authentication (SimpleJWT)
+- Python Decouple (Gestión de .env)
 
 ### Frontend
-- React 18
-- Vite
-- React Router
-- Zustand (State Management)
-- Tailwind CSS
-- Axios
+- React 18+ (Vite)
+- Tailwind CSS (Diseño Custom Neon)
+- React Router 6
+- Zustand (Estado Global)
+- Axios & JWT handling
 
 ## 🚀 Despliegue
 

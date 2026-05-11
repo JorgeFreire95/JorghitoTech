@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import { useAuthStore } from '../store';
 
 const Navbar = () => {
@@ -15,8 +16,9 @@ const Navbar = () => {
   return (
     <nav className="bg-secondary text-white shadow-lg">
       <div className="container flex justify-between items-center py-4">
-        <Link to="/" className="text-2xl font-bold text-primary">
-          JorghitoTech
+        <Link to="/" className="flex items-center gap-3">
+          <img src={logo} alt="JorghitoTech" className="h-10 w-auto" />
+          <span className="text-2xl font-bold text-primary hover:text-white transition">JorghitoTech</span>
         </Link>
 
         <div className="hidden md:flex gap-8">

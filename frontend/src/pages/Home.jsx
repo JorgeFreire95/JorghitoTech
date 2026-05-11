@@ -1,21 +1,36 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 const Home = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-secondary to-gray-800 text-white py-20">
-        <div className="container">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl font-bold mb-6">¡Bienvenido a JorghitoTech!</h1>
-            <p className="text-xl text-gray-300 mb-8">
-              Desarrollo profesional de software para web, desktop y dispositivos móviles.
-              Transformamos tus ideas en soluciones digitales innovadoras.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <Link to="/servicios" className="btn-primary">Ver Servicios</Link>
-              <Link to="/proyectos" className="btn-secondary">Ver Proyectos</Link>
+      <section className="bg-gradient-to-br from-secondary via-[#0a122a] to-secondary text-white py-32 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full filter blur-[100px] opacity-10 -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900 rounded-full filter blur-[100px] opacity-10 -ml-48 -mb-48"></div>
+        <div className="container relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="max-w-2xl text-center md:text-left">
+              <h1 className="text-6xl md:text-7xl font-extrabold mb-6 glow-text leading-tight">
+                ¡Bienvenido a <span className="text-primary">JorghitoTech</span>!
+              </h1>
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                Desarrollo profesional de software para web, desktop y dispositivos móviles.
+                Transformamos tus ideas en soluciones digitales innovadoras con tecnología de vanguardia.
+              </p>
+              <div className="flex gap-4 justify-center md:justify-start flex-wrap">
+                <Link to="/servicios" className="btn-primary">Ver Servicios</Link>
+                <Link to="/proyectos" className="btn-secondary">Ver Proyectos</Link>
+              </div>
+            </div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary rounded-full filter blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+              <img 
+                src={logo} 
+                alt="JorghitoTech Logo" 
+                className="w-64 h-64 md:w-96 md:h-96 object-contain relative z-10 animate-pulse-slow drop-shadow-[0_0_30px_rgba(0,209,255,0.3)]" 
+              />
             </div>
           </div>
         </div>
@@ -81,13 +96,13 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary text-white py-16">
+      <section className="bg-gradient-to-r from-primary to-blue-400 text-secondary py-20">
         <div className="container text-center">
-          <h2 className="text-4xl font-bold mb-6">¿Tienes un proyecto en mente?</h2>
-          <p className="text-xl mb-8 text-gray-200">
+          <h2 className="text-4xl font-extrabold mb-6">¿Tienes un proyecto en mente?</h2>
+          <p className="text-xl mb-8 font-medium">
             Estoy listo para ayudarte a convertir tu idea en realidad
           </p>
-          <Link to="/contacto" className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+          <Link to="/contacto" className="inline-block bg-secondary text-primary px-10 py-4 rounded-xl font-bold hover:bg-white hover:text-secondary transition-all shadow-xl">
             Contáctame
           </Link>
         </div>

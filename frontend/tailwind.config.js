@@ -8,8 +8,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#3B82F6",
-        secondary: "#1F2937",
+        primary: "#00D1FF", // Neon Blue
+        secondary: "#020617", // Deep Dark Navy/Black
+        accent: "#E2E8F0", // Silver/Slate
       },
     },
   },

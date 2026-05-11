@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/logo.png';
 
 const Footer = () => {
   return (
@@ -6,7 +7,10 @@ const Footer = () => {
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">JorghitoTech</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <img src={logo} alt="JorghitoTech" className="h-8 w-auto" />
+              <span className="font-bold text-lg">JorghitoTech</span>
+            </div>
             <p className="text-gray-400">Desarrollo de software profesional para web, desktop y mobile.</p>
           </div>
           

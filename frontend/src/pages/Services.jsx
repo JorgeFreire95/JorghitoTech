@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useServiceStore } from '../store';
 
 const Services = () => {
@@ -28,16 +29,55 @@ const Services = () => {
                   <div className="text-4xl mb-4">{getServiceIcon(service.service_type)}</div>
                   <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
                   <p className="text-gray-600 mb-4">{service.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm bg-primary text-white px-3 py-1 rounded">
-                      {getServiceTypeName(service.service_type)}
-                    </span>
-                    {service.price && (
-                      <span className="text-lg font-bold text-primary">
-                        ${parseFloat(service.price).toFixed(2)}
+                  
+                  {service.title.toLowerCase().includes('web') && (
+                    <div className="text-center mb-6">
+                      <Link 
+                        to="/servicios/web-planes" 
+                        className="inline-block bg-primary text-secondary px-8 py-3 rounded-lg hover:bg-white hover:shadow-[0_0_15px_rgba(0,209,255,0.5)] transition-all duration-300 font-bold"
+                      >
+                        Ver Planes
+                      </Link>
+                    </div>
+                  )}
+
+                  {service.title.toLowerCase().includes('desktop') && (
+                    <div className="text-center mb-6">
+                      <Link 
+                        to="/servicios/desktop-planes" 
+                        className="inline-block bg-primary text-secondary px-8 py-3 rounded-lg hover:bg-white hover:shadow-[0_0_15px_rgba(0,209,255,0.5)] transition-all duration-300 font-bold"
+                      >
+                        Ver Planes
+                      </Link>
+                    </div>
+                  )}
+
+                  {(service.title.toLowerCase().includes('móvil') || service.title.toLowerCase().includes('movil')) && (
+                    <div className="text-center mb-6">
+                      <Link 
+                        to="/servicios/movil-planes" 
+                        className="inline-block bg-primary text-secondary px-8 py-3 rounded-lg hover:bg-white hover:shadow-[0_0_15px_rgba(0,209,255,0.5)] transition-all duration-300 font-bold"
+                      >
+                        Ver Planes
+                      </Link>
+                    </div>
+                  )}
+
+                  {!service.title.toLowerCase().includes('web') && 
+                   !service.title.toLowerCase().includes('desktop') && 
+                   !service.title.toLowerCase().includes('movil') && 
+                   !service.title.toLowerCase().includes('móvil') && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm bg-primary text-secondary px-3 py-1 rounded font-bold">
+                        {getServiceTypeName(service.service_type)}
                       </span>
-                    )}
-                  </div>
+                      {service.price && (
+                        <span className="text-lg font-bold text-primary">
+                          ${parseFloat(service.price).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

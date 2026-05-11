@@ -10,6 +10,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contact from './pages/Contact';
+import WebPlans from './pages/WebPlans';
+import DesktopPlans from './pages/DesktopPlans';
+import MobilePlans from './pages/MobilePlans';
 import './index.css';
 
 function App() {
@@ -21,6 +24,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/servicios" element={<Services />} />
+            <Route path="/servicios/web-planes" element={<WebPlans />} />
+            <Route path="/servicios/desktop-planes" element={<DesktopPlans />} />
+            <Route path="/servicios/movil-planes" element={<MobilePlans />} />
             <Route path="/proyectos" element={<Projects />} />
             <Route path="/contacto" element={<Contact />} />
             <Route path="/login" element={<Login />} />
