@@ -2,10 +2,10 @@ import api from './api';
 
 export const authService = {
   login: (username, password) =>
-    api.post('/users/token/', { username, password }),
+    api.post('/token/', { username, password }),
   
-  register: (username, email, password) =>
-    api.post('/users/register/', { username, email, password }),
+  register: (fullName, email, password) =>
+    api.post('/users/register/', { fullName, email, password }),
   
   getCurrentUser: () =>
     api.get('/users/me/'),
@@ -22,6 +22,9 @@ export const userService = {
   
   updateProfile: (data) =>
     api.put('/users/profiles/update_profile/', data),
+    
+  getUsers: () =>
+    api.get('/users/'),
 };
 
 export const serviceService = {
@@ -36,6 +39,15 @@ export const serviceService = {
   
   deleteService: (id) =>
     api.delete(`/services/${id}/`),
+    
+  getContractedServices: () =>
+    api.get('/services/contracted/'),
+    
+  updateContractedService: (id, data) =>
+    api.put(`/services/contracted/${id}/`, data),
+    
+  createContractedService: (data) =>
+    api.post('/services/contracted/', data),
 };
 
 export const projectService = {
@@ -59,4 +71,21 @@ export const projectService = {
   
   incrementViews: (projectId) =>
     api.get(`/projects/${projectId}/increment_views/`),
+};
+
+export const supportService = {
+  getMessages: () =>
+    api.get('/support/messages/'),
+  
+  sendMessage: (data) =>
+    api.post('/support/messages/', data),
+
+  getAdminStatus: () =>
+    api.get('/support/messages/admin_status/'),
+
+  getUnreadCounts: () =>
+    api.get('/support/messages/unread_counts/'),
+
+  getUserMessages: (userId) =>
+    api.get(`/support/messages/${userId}/user_messages/`),
 };

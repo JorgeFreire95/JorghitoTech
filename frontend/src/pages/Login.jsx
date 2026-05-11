@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store';
 
 const Login = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const planId = queryParams.get('plan');
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,8 +17,15 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      await login(username, password);
-      navigate('/panel');
+      const user = await login(username, password);
+      
+      if (planId) {
+        navigate(`/onboarding?plan=${planId}`);
+      } else if (user.is_staff) {
+        navigate('/admin-panel');
+      } else {
+        navigate('/panel');
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     }
@@ -33,12 +44,13 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-bold mb-2">Usuario</label>
+            <label className="block text-gray-700 font-bold mb-2">Correo Electrónico</label>
             <input
-              type="text"
+              type="email"
+              placeholder="tu@email.com"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -47,9 +59,10 @@ const Login = () => {
             <label className="block text-gray-700 font-bold mb-2">Contraseña</label>
             <input
               type="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -57,7 +70,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-primary disabled:opacity-50"
+            className="w-full bg-primary text-secondary py-3 rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 mt-6"
           >
             {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>

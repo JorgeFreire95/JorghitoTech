@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store';
 
 const WebPlans = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const plans = [
     {
       id: 'landing',
@@ -16,7 +18,8 @@ const WebPlans = () => {
         'Entrega en 5-7 días'
       ],
       icon: '🚀',
-      price: 'Desde $299'
+      price: '$100.000 CLP',
+      monthlyFee: '$30.000 CLP'
     },
     {
       id: 'ecommerce',
@@ -31,7 +34,8 @@ const WebPlans = () => {
         'Optimización de Conversión'
       ],
       icon: '🛒',
-      price: 'Desde $899'
+      price: '$125.000 CLP',
+      monthlyFee: '$30.000 CLP'
     },
     {
       id: 'custom',
@@ -46,7 +50,8 @@ const WebPlans = () => {
         'Panel autogestionable'
       ],
       icon: '🏢',
-      price: 'Desde $599'
+      price: '$150.000 CLP',
+      monthlyFee: '$30.000 CLP'
     }
   ];
 
@@ -89,12 +94,17 @@ const WebPlans = () => {
                   </div>
 
                   <div className="mt-auto">
-                    <div className="text-3xl font-bold text-secondary mb-6">{plan.price}</div>
+                    <div className="mb-6">
+                      <div className="text-3xl font-bold text-secondary">{plan.price}</div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        + Mensualidad de <span className="font-bold text-primary">{plan.monthlyFee}</span>
+                      </div>
+                    </div>
                     <Link 
-                      to="/contacto" 
+                      to={isAuthenticated ? `/onboarding?plan=${plan.id}` : `/registro?plan=${plan.id}`} 
                       className="block text-center bg-primary text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition shadow-lg"
                     >
-                      Solicitar Cotización
+                      Elegir Plan
                     </Link>
                   </div>
                 </div>

@@ -13,6 +13,8 @@ import Contact from './pages/Contact';
 import WebPlans from './pages/WebPlans';
 import DesktopPlans from './pages/DesktopPlans';
 import MobilePlans from './pages/MobilePlans';
+import ProjectOnboarding from './pages/ProjectOnboarding';
+import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
 function App() {
@@ -36,6 +38,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <ProjectOnboarding />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-panel"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />

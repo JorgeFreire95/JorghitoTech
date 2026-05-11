@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store';
 
 const Register = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const planId = queryParams.get('plan');
+  
   const [formData, setFormData] = useState({
-    username: '',
+    fullName: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -30,8 +34,15 @@ const Register = () => {
     }
 
     try {
-      await register(formData.username, formData.email, formData.password);
-      navigate('/panel');
+      // Pasamos el email como username y el fullName como parámetro adicional
+      await register(formData.fullName, formData.email, formData.password);
+      
+      // Si venía de elegir un plan, redirigir a onboarding
+      if (planId) {
+        navigate(`/onboarding?plan=${planId}`);
+      } else {
+        navigate('/panel');
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al registrarse');
     }
@@ -40,7 +51,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center">Registrarse</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-secondary">Crear Cuenta</h2>
         
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -50,13 +61,14 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-bold mb-2">Usuario</label>
+            <label className="block text-gray-700 font-bold mb-2">Nombre Completo</label>
             <input
               type="text"
-              name="username"
-              value={formData.username}
+              name="fullName"
+              placeholder="Ej. Juan Pérez"
+              value={formData.fullName}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -66,9 +78,10 @@ const Register = () => {
             <input
               type="email"
               name="email"
+              placeholder="tu@email.com"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -78,9 +91,10 @@ const Register = () => {
             <input
               type="password"
               name="password"
+              placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -90,9 +104,10 @@ const Register = () => {
             <input
               type="password"
               name="confirmPassword"
+              placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required
             />
           </div>
@@ -100,7 +115,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-primary disabled:opacity-50"
+            className="w-full bg-primary text-secondary py-3 rounded-xl font-bold hover:shadow-lg transition disabled:opacity-50 mt-6"
           >
             {isLoading ? 'Cargando...' : 'Registrarse'}
           </button>

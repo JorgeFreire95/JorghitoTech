@@ -31,6 +31,9 @@ const Navbar = () => {
         <div className="hidden md:flex gap-4">
           {isAuthenticated ? (
             <>
+              {user?.is_staff && (
+                <Link to="/admin-panel" className="hover:text-primary transition font-bold border-r border-gray-600 pr-4 mr-2">Admin</Link>
+              )}
               <Link to="/panel" className="btn-primary">Panel</Link>
               <button onClick={handleLogout} className="btn-secondary">
                 Salir

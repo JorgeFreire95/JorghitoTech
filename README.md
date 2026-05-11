@@ -6,11 +6,13 @@ Plataforma profesional diseñada para ofrecer soluciones integrales en desarroll
 
 - ✅ **Identidad Visual Premium**: Tema oscuro con acentos de Cian Neón y efectos de resplandor (Glow).
 - ✅ **Planes Detallados**: Secciones específicas para Landing Pages, E-commerce, Sistemas Administrativos y Apps Móviles.
-- ✅ **Panel de Control**: Gestión integral de proyectos y servicios desde un dashboard privado.
-- ✅ **Autenticación Segura**: Implementación de JWT para proteger el acceso administrativo.
+- ✅ **Panel de Administración**: Gestión centralizada de usuarios, servicios contratados y progreso de proyectos exclusivo para personal (is_staff).
+- ✅ **Soporte Multi-usuario**: Sistema de chat integral con notificaciones de mensajes no leídos y comunicación en tiempo real entre admin y clientes.
+- ✅ **Seguimiento de Progreso**: Visualización dinámica del porcentaje de avance y estados de los servicios adquiridos (Desarrollo, Revisión, Finalizado).
+- ✅ **Autenticación Segura**: Implementación de JWT para proteger el acceso administrativo y de clientes.
 - ✅ **Portafolio Interactivo**: Galería de proyectos con filtrado y sistema de comentarios.
 - ✅ **Diseño Responsivo**: Optimizado para dispositivos móviles, tablets y escritorio con Tailwind CSS.
-- ✅ **API REST Robusta**: Motor backend potente desarrollado con Django.
+- ✅ **API REST Robusta**: Motor backend potente desarrollado con Django y soporte para tareas asíncronas básicas.
 
 ## 📋 Requisitos Previos
 
@@ -101,6 +103,7 @@ JorghitoTech/
 │   │   ├── core/              # Configuración del proyecto
 │   │   ├── users/             # App de usuarios
 │   │   ├── services/          # App de servicios
+│   │   ├── support/           # App de soporte (Chat y Notificaciones)
 │   │   └── projects/          # App de proyectos
 │   ├── manage.py
 │   ├── requirements.txt
@@ -132,7 +135,8 @@ JorghitoTech/
 - `/proyectos` - Portafolio de proyectos
 - `/contacto` - Formulario de solicitud de cotización
 - `/login` - Acceso administrativo
-- `/panel` - Dashboard de gestión (Ruta Protegida)
+- `/panel` - Dashboard de cliente (Servicios contratados)
+- `/admin-panel` - Panel de administración (Gestión de usuarios y chat)
 
 ### Backend API
 - `GET /api/services/` - Obtener servicios
@@ -140,6 +144,10 @@ JorghitoTech/
 - `POST /api/users/register/` - Registrar usuario
 - `POST /api/token/` - Obtener token JWT
 - `GET /api/users/me/` - Obtener usuario autenticado
+- `GET /api/support/messages/` - Historial de chat (Filtro automático por usuario)
+- `POST /api/support/messages/` - Enviar mensaje (Soporta respuestas de admin)
+- `GET /api/support/messages/unread_counts/` - Conteo de notificaciones (Admin)
+- `GET /api/support/messages/admin_status/` - Estado de conexión del admin
 
 ## 🔐 Variables de Entorno
 

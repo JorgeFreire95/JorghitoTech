@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'portfolio_api.users',
     'portfolio_api.services',
     'portfolio_api.projects',
+    'portfolio_api.support',
 ]
 
 MIDDLEWARE = [

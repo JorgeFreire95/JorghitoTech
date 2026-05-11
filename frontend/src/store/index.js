@@ -30,11 +30,11 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  register: async (username, email, password) => {
+  register: async (fullName, email, password) => {
     set({ isLoading: true, error: null });
     try {
-      await authService.register(username, email, password);
-      return await set.login(username, password);
+      await authService.register(fullName, email, password);
+      return await useAuthStore.getState().login(email, password);
     } catch (error) {
       set({
         error: error.response?.data?.detail || 'Error al registrarse',
@@ -161,6 +161,147 @@ export const useProjectStore = create((set) => ({
       });
     } catch (error) {
       set({ error: error.message, isLoading: false });
+    }
+  },
+}));
+
+export const useContractedServiceStore = create((set, get) => ({
+  contractedServices: [],
+  isLoading: false,
+  error: null,
+
+  fetchContractedServices: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { serviceService } = await import('../services');
+      const response = await serviceService.getContractedServices();
+      set({ contractedServices: response.data.results || response.data, isLoading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.detail || 'Error al cargar servicios', isLoading: false });
+    }
+  },
+
+  updateContractedService: async (id, data) => {
+    set({ isLoading: true });
+    try {
+      const { serviceService } = await import('../services');
+      const response = await serviceService.updateContractedService(id, data);
+      const updated = get().contractedServices.map(s => s.id === id ? response.data : s);
+      set({ contractedServices: updated, isLoading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.detail || 'Error al actualizar servicio', isLoading: false });
+      throw error;
+    }
+  },
+
+  createContractedService: async (data) => {
+    set({ isLoading: true });
+    try {
+      const { serviceService } = await import('../services');
+      const response = await serviceService.createContractedService(data);
+      set({ contractedServices: [...get().contractedServices, response.data], isLoading: false });
+      return response.data;
+    } catch (error) {
+      set({ error: error.response?.data?.detail || 'Error al crear servicio', isLoading: false });
+      throw error;
+    }
+  },
+}));
+
+export const useUserStore = create((set) => ({
+  users: [],
+  isLoading: false,
+  error: null,
+
+  fetchUsers: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { userService } = await import('../services');
+      const response = await userService.getUsers();
+      set({ users: response.data.results || response.data, isLoading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.detail || 'Error al cargar usuarios', isLoading: false });
+    }
+  },
+}));
+
+export const useSupportStore = create((set, get) => ({
+  messages: [],
+  unreadCounts: {}, // { userId: count }
+  isAdminOnline: false,
+  isLoading: false,
+  error: null,
+
+  fetchAdminStatus: async () => {
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.getAdminStatus();
+      set({ isAdminOnline: response.data.is_online });
+    } catch (error) {
+      console.error("Error fetching admin status", error);
+    }
+  },
+
+  fetchUnreadCounts: async () => {
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.getUnreadCounts();
+      const counts = {};
+      response.data.forEach(item => {
+        counts[item.sender] = item.count;
+      });
+      set({ unreadCounts: counts });
+    } catch (error) {
+      console.error("Error fetching unread counts", error);
+    }
+  },
+
+  fetchMessages: async () => {
+    set({ isLoading: true });
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.getMessages();
+      // Si la respuesta está paginada, los datos están en results
+      const messagesData = response.data.results || response.data;
+      set({ messages: Array.isArray(messagesData) ? messagesData : [], isLoading: false });
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  fetchUserMessages: async (userId) => {
+    set({ isLoading: true });
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.getUserMessages(userId);
+      set({ messages: response.data, isLoading: false });
+      // Limpiar conteo localmente
+      const newCounts = { ...get().unreadCounts };
+      delete newCounts[userId];
+      set({ unreadCounts: newCounts });
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  sendMessage: async (body, recipientId = null) => {
+    try {
+      const { supportService } = await import('../services');
+      const payload = { body };
+      if (recipientId) {
+        payload.recipient = recipientId;
+        payload.is_admin_reply = true;
+      }
+      const response = await supportService.sendMessage(payload);
+      // Forzar recarga inmediata para sincronizar con el servidor
+      if (recipientId) {
+        await get().fetchUserMessages(recipientId);
+      } else {
+        await get().fetchMessages();
+      }
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
     }
   },
 }));

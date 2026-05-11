@@ -23,21 +23,26 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
-        """Registra un nuevo usuario"""
-        username = request.data.get('username')
+        """Registra un nuevo usuario usando email como usuario principal"""
         email = request.data.get('email')
         password = request.data.get('password')
+        full_name = request.data.get('fullName')
+        username = email # Siempre usar email como username
 
-        if not username or not email or not password:
-            return Response({'detail': 'Faltan campos requeridos'}, 
+        if not email or not password or not full_name:
+            return Response({'detail': 'Todos los campos son obligatorios'}, 
                           status=status.HTTP_400_BAD_REQUEST)
 
-        if User.objects.filter(username=username).exists():
-            return Response({'detail': 'El usuario ya existe'}, 
+        if User.objects.filter(email=email).exists():
+            return Response({'detail': 'Este correo ya está registrado'}, 
                           status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        UserProfile.objects.create(user=user)
+        user = User.objects.create_user(
+            username=username, 
+            email=email, 
+            password=password,
+            first_name=full_name
+        )
         
         serializer = UserDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
