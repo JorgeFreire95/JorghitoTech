@@ -3,19 +3,27 @@ import { useAuthStore, useSupportStore, useContractedServiceStore } from '../sto
 
 const Dashboard = () => {
   const { user } = useAuthStore();
-  const { messages, fetchMessages, sendMessage, isAdminOnline, fetchAdminStatus, isLoading: messagesLoading } = useSupportStore();
+  const { messages, fetchMessages, sendMessage, isAdminOnline, fetchAdminStatus, isLoading: messagesLoading, tickets, fetchTickets, createTicket } = useSupportStore();
   const { contractedServices, fetchContractedServices, isLoading: servicesLoading } = useContractedServiceStore();
   const [newMessage, setNewMessage] = useState('');
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [ticketData, setTicketData] = useState({
+    subject: '',
+    description: '',
+    priority: 'medium'
+  });
   const messageContainerRef = useRef(null);
 
   useEffect(() => {
     fetchMessages();
     fetchAdminStatus();
     fetchContractedServices();
+    fetchTickets();
     const interval = setInterval(() => {
       fetchMessages();
       fetchAdminStatus();
       fetchContractedServices();
+      fetchTickets();
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -43,6 +51,19 @@ const Dashboard = () => {
       setNewMessage('');
     } catch (err) {
       console.error("Error sending message", err);
+    }
+  };
+
+  const handleTicketSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createTicket(ticketData);
+      setIsTicketModalOpen(false);
+      setTicketData({ subject: '', description: '', priority: 'medium' });
+      alert('Ticket creado exitosamente');
+    } catch (err) {
+      console.error("Error creating ticket", err);
+      alert('Error al crear el ticket');
     }
   };
 
@@ -100,15 +121,28 @@ const Dashboard = () => {
                           ></div>
                         </div>
 
-                        {service.progress === 100 && service.website_url && (
+                        {service.delivery_instructions && (
+                          <div className="mt-6 p-4 bg-secondary text-white rounded-2xl border-l-4 border-primary shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-primary text-lg">💡</span>
+                              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Instrucciones de Entrega</h4>
+                            </div>
+                            <p className="text-xs opacity-90 leading-relaxed italic">
+                              "{service.delivery_instructions}"
+                            </p>
+                          </div>
+                        )}
+
+                        {service.website_url && (
                           <div className="mt-6 flex justify-end">
                             <a 
                               href={service.website_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="bg-secondary text-primary px-6 py-3 rounded-xl font-black hover:shadow-xl hover:-translate-y-0.5 transition flex items-center gap-2 border border-primary border-opacity-30 active:scale-95"
+                              className="bg-secondary text-white px-8 py-3.5 rounded-xl font-black hover:shadow-2xl hover:bg-primary hover:text-secondary hover:-translate-y-1 transition-all flex items-center gap-3 border border-white/10 active:scale-95 group/btn"
                             >
-                              <span>🌐</span> Ver Sitio Web
+                              <span className="text-lg group-hover/btn:rotate-12 transition-transform">🚀</span>
+                              <span>{service.status === 'finalizado' ? 'Descargar / Visitar Proyecto' : 'Ver Avance en Vivo'}</span>
                             </a>
                           </div>
                         )}
@@ -170,15 +204,57 @@ const Dashboard = () => {
                   </form>
                 </div>
                 
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 h-[450px] flex flex-col justify-center text-center">
-                  <div className="w-20 h-20 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                    🛠️
+                <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 h-[450px] flex flex-col">
+                  <div className="flex-grow flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                      🛠️
+                    </div>
+                    <h3 className="text-xl font-bold text-secondary mb-2">Soporte Técnico</h3>
+                    <p className="text-gray-500 text-sm mb-6">¿Necesitas ayuda formal o tienes una emergencia?</p>
+                    <button 
+                      onClick={() => setIsTicketModalOpen(true)}
+                      className="bg-secondary text-white px-8 py-4 rounded-xl font-bold hover:bg-opacity-90 transition inline-block mb-4"
+                    >
+                      Enviar Ticket
+                    </button>
                   </div>
-                  <h3 className="text-xl font-bold text-secondary mb-4">Soporte Técnico</h3>
-                  <p className="text-gray-500 mb-8">¿Necesitas ayuda con alguno de tus servicios o tienes una emergencia?</p>
-                  <a href="mailto:soporte@jorghitotech.com" className="bg-secondary text-white px-8 py-4 rounded-xl font-bold hover:bg-opacity-90 transition inline-block">
-                    Enviar Ticket
-                  </a>
+
+                  {/* List of recent tickets */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 text-left overflow-y-auto max-h-[150px]">
+                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Mis Tickets Recientes</h4>
+                    <div className="space-y-2">
+                      {tickets.length === 0 ? (
+                        <p className="text-xs text-gray-400 italic text-center py-2">No tienes tickets abiertos.</p>
+                      ) : (
+                        tickets.slice(0, 3).map(ticket => (
+                          <div key={ticket.id} className="space-y-1 group">
+                            <div className="bg-white p-3 rounded-2xl border border-gray-100 flex justify-between items-center hover:border-primary/30 hover:shadow-md transition-all duration-300">
+                              <div className="overflow-hidden">
+                                <p className="text-[11px] font-black text-secondary truncate group-hover:text-primary transition-colors">{ticket.subject}</p>
+                                <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">#{ticket.id} • {new Date(ticket.created_at).toLocaleDateString()}</span>
+                              </div>
+                              <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-lg border ${
+                                ticket.status === 'open' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                                ticket.status === 'in_progress' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
+                                'bg-gray-50 text-gray-400 border-gray-100'
+                              }`}>
+                                {ticket.status === 'open' ? 'Abierto' : ticket.status === 'in_progress' ? 'En Proceso' : 'Cerrado'}
+                              </span>
+                            </div>
+                            {ticket.admin_reply && (
+                              <div className="p-3 bg-secondary text-white rounded-2xl border-l-4 border-primary ml-2 shadow-sm animate-in slide-in-from-left-2 duration-300">
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <span className="text-[10px]">✨</span>
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-primary">Respuesta JorghitoTech</p>
+                                </div>
+                                <p className="text-[10px] opacity-90 leading-relaxed font-medium">{ticket.admin_reply}</p>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -195,25 +271,76 @@ const Dashboard = () => {
                   {contractedServices.length === 0 ? (
                     <p className="text-gray-400 text-center py-4 text-sm italic">No hay pagos pendientes.</p>
                   ) : (
-                    contractedServices.map((service) => (
-                      <div key={service.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
-                        <p className="font-bold text-secondary text-sm mb-1">{service.name}</p>
-                        <div className="flex justify-between items-center mb-4">
-                          <span className="text-gray-500 text-sm">Próximo pago: {service.next_payment || 'N/A'}</span>
-                          <span className="font-bold text-secondary">${parseFloat(service.monthly_fee).toLocaleString()}</span>
-                        </div>
+                    contractedServices.map((service) => {
+                      const checkExpiring = (dateStr) => {
+                        if (!dateStr) return false;
+                        const nextPayment = new Date(dateStr);
+                        const today = new Date();
+                        // Reset hours to compare only dates
+                        today.setHours(0, 0, 0, 0);
+                        nextPayment.setHours(0, 0, 0, 0);
                         
-                        {service.is_maintenance_paid ? (
-                          <div className="bg-green-50 text-green-600 p-3 rounded-xl text-center text-sm font-bold flex items-center justify-center gap-2">
-                            <span className="text-lg">✓</span> Pagado
+                        const diffTime = nextPayment - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        
+                        return { 
+                          isExpiring: diffDays >= 0 && diffDays <= 5, 
+                          isExpired: diffDays < 0,
+                          daysLeft: diffDays 
+                        };
+                      };
+                      const { isExpiring, isExpired, daysLeft } = checkExpiring(service.next_payment);
+
+                      return (
+                        <div key={service.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                          <div className="flex justify-between items-start mb-2">
+                            <p className="font-bold text-secondary text-sm">{service.name}</p>
+                            <span className="font-bold text-secondary text-sm">${parseFloat(service.monthly_fee).toLocaleString()}</span>
                           </div>
-                        ) : (
-                          <button className="w-full bg-primary text-secondary py-3 rounded-xl font-bold hover:shadow-lg transition">
-                            Pagar Mantención
-                          </button>
-                        )}
-                      </div>
-                    ))
+                          
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="text-gray-400 text-[10px] uppercase font-black tracking-widest">Próximo pago:</span>
+                            <span className={`text-[11px] font-black ${isExpired ? 'text-red-600' : isExpiring ? 'text-amber-500 animate-pulse' : 'text-secondary'}`}>
+                              {service.next_payment ? new Date(service.next_payment + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Pendiente de cálculo'}
+                            </span>
+                          </div>
+                          
+                          {isExpired && !service.is_maintenance_paid && (
+                            <div className="mb-4 p-4 bg-red-600 text-white rounded-xl flex items-center gap-3 animate-bounce shadow-lg shadow-red-200">
+                              <span className="text-2xl">🚫</span>
+                              <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-red-100">Servicio Vencido</p>
+                                <p className="text-[11px] font-bold">Tu servicio ha expirado. Paga ahora para reactivarlo.</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {isExpiring && !isExpired && !service.is_maintenance_paid && (
+                            <div className="mb-4 p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-3 animate-in fade-in zoom-in duration-300">
+                              <span className="text-xl">⚠️</span>
+                              <div>
+                                <p className="text-[10px] font-black text-amber-600 uppercase">¡Atención!</p>
+                                <p className="text-[10px] text-amber-500 font-medium">Vence en {daysLeft} días. Evita la suspensión.</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {service.is_maintenance_paid ? (
+                            <div className="bg-green-50 text-green-600 p-3 rounded-xl text-center text-sm font-bold flex items-center justify-center gap-2 border border-green-100 shadow-sm">
+                              <span className="text-lg">✓</span> Pagado
+                            </div>
+                          ) : (
+                            <button className={`w-full py-3 rounded-xl font-black transition-all hover:-translate-y-0.5 active:scale-95 ${
+                              isExpired 
+                                ? 'bg-red-600 text-white hover:bg-red-700 shadow-xl shadow-red-100' 
+                                : 'bg-primary text-secondary hover:shadow-lg'
+                            }`}>
+                              {isExpired ? 'Reactivar Servicio' : 'Pagar Mantención'}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -227,6 +354,86 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
+      {/* Ticket Modal */}
+      {isTicketModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-secondary/80 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="bg-primary p-6 text-secondary flex justify-between items-center">
+              <h3 className="text-2xl font-black">Levantar Ticket</h3>
+              <button 
+                onClick={() => setIsTicketModalOpen(false)}
+                className="text-secondary hover:scale-110 transition p-2"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleTicketSubmit} className="p-8 space-y-6">
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Asunto del Ticket</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Ej. Problema con mi dominio, Error en el despliegue..."
+                  value={ticketData.subject}
+                  onChange={(e) => setTicketData({...ticketData, subject: e.target.value})}
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-primary outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Prioridad</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {['low', 'medium', 'high'].map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setTicketData({...ticketData, priority: p})}
+                      className={`py-2 rounded-xl text-xs font-bold border-2 transition ${
+                        ticketData.priority === p 
+                          ? 'border-primary bg-primary/10 text-secondary' 
+                          : 'border-gray-100 text-gray-400 hover:border-gray-200'
+                      }`}
+                    >
+                      {p === 'low' ? 'Baja' : p === 'medium' ? 'Media' : 'Alta'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Descripción del Problema</label>
+                <textarea 
+                  required
+                  rows="4"
+                  placeholder="Describe detalladamente tu problema..."
+                  value={ticketData.description}
+                  onChange={(e) => setTicketData({...ticketData, description: e.target.value})}
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-primary outline-none transition resize-none"
+                ></textarea>
+              </div>
+
+              <div className="pt-4 flex gap-4">
+                <button 
+                  type="button"
+                  onClick={() => setIsTicketModalOpen(false)}
+                  className="flex-1 px-6 py-4 rounded-xl font-bold text-gray-400 hover:bg-gray-50 transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-[2] bg-primary text-secondary px-6 py-4 rounded-xl font-black shadow-lg shadow-primary/20 hover:shadow-xl transition active:scale-95"
+                >
+                  Crear Ticket
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

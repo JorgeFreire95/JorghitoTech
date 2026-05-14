@@ -14,3 +14,27 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From {self.sender.username} at {self.created_at}"
+
+class SupportTicket(models.Model):
+    STATUS_CHOICES = [
+        ('open', 'Abierto'),
+        ('in_progress', 'En Proceso'),
+        ('closed', 'Cerrado'),
+    ]
+    PRIORITY_CHOICES = [
+        ('low', 'Baja'),
+        ('medium', 'Media'),
+        ('high', 'Alta'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets')
+    subject = models.CharField(max_length=200)
+    description = models.TextField()
+    admin_reply = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Ticket #{self.id}: {self.subject} ({self.user.username})"

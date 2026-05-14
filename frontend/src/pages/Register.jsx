@@ -10,6 +10,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
@@ -35,7 +36,7 @@ const Register = () => {
 
     try {
       // Pasamos el email como username y el fullName como parámetro adicional
-      await register(formData.fullName, formData.email, formData.password);
+      await register(formData.fullName, formData.email, formData.password, formData.phone);
       
       // Si venía de elegir un plan, redirigir a onboarding
       if (planId) {
@@ -80,6 +81,19 @@ const Register = () => {
               name="email"
               placeholder="tu@email.com"
               value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-bold mb-2">Número de Celular</label>
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Ej. +51 987 654 321"
+              value={formData.phone}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition"
               required

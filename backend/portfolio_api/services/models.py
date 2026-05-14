@@ -37,11 +37,31 @@ class ContractedService(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='desarrollo')
     progress = models.IntegerField(default=0)
     website_url = models.URLField(blank=True, null=True)
+    delivery_instructions = models.TextField(blank=True, null=True)
     monthly_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     next_payment = models.DateField(null=True, blank=True)
     is_maintenance_paid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-calculate progress based on status
+        if self.status == 'desarrollo':
+            self.progress = 25
+        elif self.status == 'revision':
+            self.progress = 50
+        elif self.status == 'finalizado':
+            self.progress = 100
+        
+        # Auto-calculate next payment if not set (30 days from creation)
+        if not self.next_payment:
+            from datetime import timedelta
+            from django.utils import timezone
+            # Use current date if it's a new instance
+            base_date = timezone.now().date()
+            self.next_payment = base_date + timedelta(days=30)
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} - {self.user.username}"

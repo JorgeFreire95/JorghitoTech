@@ -30,10 +30,10 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  register: async (fullName, email, password) => {
+  register: async (fullName, email, password, phone) => {
     set({ isLoading: true, error: null });
     try {
-      await authService.register(fullName, email, password);
+      await authService.register(fullName, email, password, phone);
       return await useAuthStore.getState().login(email, password);
     } catch (error) {
       set({
@@ -301,6 +301,46 @@ export const useSupportStore = create((set, get) => ({
       }
     } catch (error) {
       set({ error: error.message });
+      throw error;
+    }
+  },
+
+  tickets: [],
+  fetchTickets: async () => {
+    set({ isLoading: true });
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.getTickets();
+      const ticketsData = response.data.results || response.data;
+      set({ tickets: Array.isArray(ticketsData) ? ticketsData : [], isLoading: false });
+    } catch (error) {
+      set({ error: error.message, isLoading: false, tickets: [] });
+    }
+  },
+
+  createTicket: async (data) => {
+    set({ isLoading: true });
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.createTicket(data);
+      set({ tickets: [response.data, ...get().tickets], isLoading: false });
+      return response.data;
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
+      throw error;
+    }
+  },
+
+  updateTicket: async (id, data) => {
+    set({ isLoading: true });
+    try {
+      const { supportService } = await import('../services');
+      const response = await supportService.updateTicket(id, data);
+      const updated = get().tickets.map(t => t.id === id ? response.data : t);
+      set({ tickets: updated, isLoading: false });
+      return response.data;
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
       throw error;
     }
   },

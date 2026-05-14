@@ -27,6 +27,7 @@ class UserViewSet(viewsets.ModelViewSet):
         email = request.data.get('email')
         password = request.data.get('password')
         full_name = request.data.get('fullName')
+        phone = request.data.get('phone')
         username = email # Siempre usar email como username
 
         if not email or not password or not full_name:
@@ -43,6 +44,11 @@ class UserViewSet(viewsets.ModelViewSet):
             password=password,
             first_name=full_name
         )
+        
+        # Guardar teléfono en el perfil (creado automáticamente por señales)
+        if phone:
+            user.profile.phone = phone
+            user.profile.save()
         
         serializer = UserDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
